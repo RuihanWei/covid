@@ -36,7 +36,27 @@ def load_world():
     df = df.reorder_levels([1,2,0], axis=1).sort_index(axis=1)
 
     return df
-        
+
+@cachetools.func.ttl_cache(ttl=3600)
+def load_canada():
+    sources = {
+        'confirmed': 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
+        'death': 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
+    }
+
+    # Load each data file into a dataframe with row index = date, and column index = (country, province)
+    d = {key: load_and_massage(url) for key, url in sources.items()}
+
+    # Concatenate data frames: column index is now (variable, country, province)
+    df = pd.concat(d.values(), axis=1, keys=d.keys())
+
+    # Permute order of index to (country, province, variable) and sort the columns by the index value
+    df = df.reorder_levels([1, 2, 0], axis=1).sort_index(axis=1)
+
+    return df["Canada"]
+
+
+
 #@functools.lru_cache(128)
 @cachetools.func.ttl_cache(ttl=3600)
 def load_us():

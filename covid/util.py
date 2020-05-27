@@ -61,6 +61,28 @@ def load_world_data():
       
     return world_data
 
+def load_canada_data():
+    canada = jhu.load_canada()
+
+    # population estimation from https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710000901
+    canada_data = {"Ontario": {'pop': 14711827,'data': canada['Ontario'] ,'name':'Ontario'},
+                   "Nova Scotia" : {'pop': 977457, 'data': canada['Nova Scotia'], 'name': 'Nova Scotia'},
+                   "Newfoundland and Labrador": {'pop': 521365, 'data': canada['Newfoundland and Labrador'], 'name': 'Newfoundland and Labrador'},
+                   "Prince Edward Island": {'pop': 158158, 'data': canada['Prince Edward Island'], 'name': 'Prince Edward Island'},
+                   "New Brunswick": {'pop': 779993, 'data': canada['New Brunswick'], 'name': 'New Brunswick'},
+                   "Quebec": {'pop': 8537674, 'data': canada['Quebec'], 'name': 'Quebec'},
+                   "Manitoba": {'pop': 1377517, 'data': canada['Manitoba'], 'name': 'Manitoba'},
+                   "Saskatchewan": {'pop': 1181666, 'data': canada['Saskatchewan'], 'name': 'Saskatchewan'},
+                   "Alberta": {'pop': 4413146, '5110917': canada['Alberta'], 'name': 'Alberta'},
+                   "British Columbia": {'pop': 4413146, 'data': canada['British Columbia'], 'name': 'British Columbia'},
+                   "Yukon": {'pop': 41078, 'data': canada['Yukon'], 'name': 'Yukon'},
+                   "Northwest Territories": {'pop': 44904, 'data': canada['Northwest Territories'], 'name': 'Northwest Territories'},
+                   # no confirmed case in Nunavut as of now, no data available
+                   # "Nunavut": {'pop': 39097, 'data': canada['Nunavut'], 'name': 'Nunavut'},
+                   }
+    return canada_data
+
+
 
 def load_state_data(source="jhu"):
 
@@ -88,7 +110,8 @@ def load_state_data(source="jhu"):
 def load_data(us_source="jhu"):
     state_data = load_state_data(source=us_source)
     world_data = load_world_data()
-    return dict(world_data, **state_data)
+    canada_data = load_canada_data()
+    return dict(world_data, **state_data, **canada_data)
 
 
 def load_state_Xy(which=None):
@@ -185,7 +208,7 @@ def run_place(data,
               **kwargs):
 
 
-    numpyro.enable_x64()
+    # numpyro.enable_x64()
 
     print(f"Running {place} (start={start}, end={end})")
     place_data = data[place]['data'][start:end]
